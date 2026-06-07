@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cybersecurity Project — Tracking Dashboard</title>
+  <style>
+    * { box-sizing: border-box; }
+    body { font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif; background: #f5f7fa; margin: 0; padding: 20px; color: #1f2937; }
+    h1 { color: #111827; font-size: 24px; margin-bottom: 10px; border-bottom: 2px solid #3b82f6; padding-bottom: 10px; }
+    h2 { font-size: 16px; color: #374151; margin-top: 20px; margin-bottom: 10px; border-left: 4px solid #3b82f6; padding-left: 10px; }
+    .phase { background: white; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); margin-bottom: 20px; overflow: hidden; }
+    .phase-header { background: #eff6ff; padding: 12px 16px; font-weight: 600; font-size: 14px; color: #1e40af; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #dbeafe; }
+    .phase-body { padding: 12px 16px; }
+    .task-list { list-style: none; margin: 0; padding-left: 0; }
+    .task-item { display: flex; align-items: flex-start; gap: 10px; padding: 8px 0; font-size: 14px; border-bottom: 1px dashed #e5e7eb; }
+    .task-item:last-child { border-bottom: none; }
+    input[type="checkbox"] { width: 18px; height: 18px; margin-top: 3px; accent-color: #10b981; cursor: pointer; }
+    input[type="checkbox"]:checked + span { text-decoration: line-through; color: #6b7280; }
+    .status-badge { display: inline-block; padding: 2px 8px; border-radius: 12px; font-size: 12px; font-weight: 500; background: #d1fae5; color: #065f46; margin-left: auto; }
+    .status-badge.warning { background: #fef3c7; color: #92400e; }
+    .status-badge.danger { background: #fee2e2; color: #b91c1c; }
+    .completed { flex-wrap: wrap; gap: 8px; margin-top: 10px; font-size: 13px; color: #6b7280; }
+    .completed .item::before { content: "✓"; color: #10b981; margin-right: 4px; }
+    footer { margin-top: 30px; padding-top: 15px; border-top: 1px solid #e5e7eb; font-size: 12px; color: #6b7280; }
+  </style>
+</head>
+<body>
+
+<h1>Cybersecurity Project — Tracking Dashboard</h1>
+
+<div class="phase">
+  <div class="phase-header"><strong>Phase 1: Foundation (Week 1)</strong><span id="phase-1-status"></span></div>
+  <div class="phase-body">
+    <ul class="task-list">
+      <li class="task-item">
+        <input type="checkbox" id="p1-task-1"><label for="p1-task-1"><span>Create local dev environment (Docker Compose on NAS/WSL2)</span></label>
+      </li>
+      <li class="task-item">
+        <input type="checkbox" id="p1-task-2"><label for="p1-task-2"><span>Build network monitor baseline (Zeek + log collector)</span></label>
+      </li>
+      <li class="task-item">
+        <input type="checkbox" id="p1-task-3"><label for="p1-task-3"><span>Basic HTML dashboard skeleton with Flask/HTMX</span></label>
+      </li>
+    </ul>
+    <div id="p1-completed" class="completed"></div>
+  </div>
+</div>
+
+<div class="phase">
+  <div class="phase-header"><strong>Phase 2: Vulnerability Scanning (Week 2-3)</strong><span id="phase-2-status"></span></div>
+  <div class="phase-body">
+    <ul class="task-list">
+      <li class="task-item">
+        <input type="checkbox" id="p2-task-1"><label for="p2-task-1"><span>Implement Nmap-based asset discovery</span></label>
+      </li>
+      <li class="task-item">
+        <input type="checkbox" id="p2-task-2"><label for="p2-task-2"><span>Add vuln scanner integration (Nuclei or custom Python scripts)</span></label>
+      </li>
+      <li class="task-item">
+        <input type="checkbox" id="p2-task-3"><label for="p2-task-3"><span>Auto-lookup engine for CVE/NVD API queries</span></label>
+      </li>
+    </ul>
+    <div id="p2-completed" class="completed"></div>
+  </div>
+</div>
+
+<div class="phase">
+  <div class="phase-header"><strong>Phase 3: Dashboard Integration (Week 3-4)</strong><span id="phase-3-status"></span></div>
+  <div class="phase-body">
+    <ul class="task-list">
+      <li class="task-item">
+        <input type="checkbox" id="p3-task-1"><label for="p3-task-1"><span>Live traffic visualization</span></label>
+      </li>
+      <li class="task-item">
+        <input type="checkbox" id="p3-task-2"><label for="p3-task-2"><span>Vulnerability alerting and detail view</span></label>
+      </li>
+      <li class="task-item">
+        <input type="checkbox" id="p3-task-3"><label for="p3-task-3"><span>Rule engine for severity scoring</span></label>
+      </li>
+    </ul>
+    <div id="p3-completed" class="completed"></div>
+  </div>
+</div>
+
+<div class="phase">
+  <div class="phase-header"><strong>Phase 4: Security Hardening (Week 5)</strong><span id="phase-4-status"></span></div>
+  <div class="phase-body">
+    <ul class="task-list">
+      <li class="task-item">
+        <input type="checkbox" id="p4-task-1"><label for="p4-task-1"><span>Rate limiting on API endpoints</span></label>
+      </li>
+      <li class="task-item">
+        <input type="checkbox" id="p4-task-2"><label for="p4-task-2"><span>Database backup automation</span></label>
+      </li>
+      <li class="task-item">
+        <input type="checkbox" id="p4-task-3"><label for="p4-task-3"><span>Audit logging</span></label>
+      </li>
+    </ul>
+    <div id="p4-completed" class="completed"></div>
+  </div>
+</div>
+
+<footer>
+  Last updated: <span id="last-updated"></span><br>
+  Total Tasks: <span id="total-tasks">13</span> | Completed: <span id="completed-tasks">0</span><br>
+  Progress: <span id="progress-bar">0%</span>
+</footer>
+
+<script>
+(function() {
+  const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+  const tasks = Array.from(checkboxes);
+  
+  function updateProgress() {
+    const completed = tasks.filter(t => t.checked).length;
+    const total = tasks.length;
+    const percent = Math.round((completed / total) * 100);
+    
+    document.getElementById('total-tasks').textContent = total;
+    document.getElementById('completed-tasks').textContent = completed;
+    document.getElementById('progress-bar').textContent = percent + "%";
+    document.getElementById('progress-bar').style.background = 
+      percent > 50 ? '#10b981' : percent > 25 ? '#fbbf24' : '#f59e0b';
+    
+    [1,2,3,4].forEach(p => {
+      const container = document.getElementById('p' + p + '-completed');
+      const checkedInPhase = tasks.filter(t => t.id.startsWith('p' + p)).filter(t => t.checked).length;
+      if (checkedInPhase > 0) {
+        const items = [];
+        tasks.filter(t => t.id.startsWith('p' + p)).forEach(t => {
+          items.push('<span class="item">' + t.nextElementSibling.textContent.replace(/^\s+|\s+$/g, '') + '</span>');
+        });
+        container.innerHTML = '<strong>Completed:</strong>' + items.join('\n');
+      }
+      
+      const phaseBadge = document.getElementById('phase-' + p + '-status');
+      if (checkedInPhase === tasks.filter(t => t.id.startsWith('p' + p)).length) {
+        phaseBadge.textContent = '✓ Phase Complete';
+        phaseBadge.className = 'status-badge';
+      } else if (checkedInPhase > 0) {
+        phaseBadge.textContent = checkedInPhase + '/' + tasks.filter(t => t.id.startsWith('p' + p)).length;
+        phaseBadge.className = 'status-badge warning';
+      } else {
+        phaseBadge.textContent = '';
+      }
+    });
+    
+    document.getElementById('last-updated').textContent = new Date().toLocaleString();
+  }
+  
+  tasks.forEach(t => t.addEventListener('change', updateProgress));
+  updateProgress(); // Initial call
+})();
+</script>
+
+</body>
+</html>
