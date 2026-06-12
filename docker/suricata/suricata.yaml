@@ -1,0 +1,92 @@
+# Suricata Configuration for SOC Station
+# ========================================
+# This configuration is tailored for home-lab IDS deployment
+# Key features:
+#   - eve.json log output to JSON events
+#   - Network interface auto-detection
+#   - Rule paths for threat detection
+#   - Non-root user capability (requires privileged=true in docker-compose)
+
+default-log-level: information
+
+# Run mode: standalone for home-lab (no active response in production)
+runmode: threaded
+
+# Interfaces to monitor — adjust based on your network topology
+# Option 1: Auto-detect all interfaces with 'any'
+interface: any
+# Option 2: Explicit interface binding (uncomment and modify as needed)
+# interface: eth0
+# loopback: no
+
+# Sniff mode for promiscuous capture from Docker bridge
+sniff: yes
+
+# Private networks to ignore (reduces noise)
+private_networks:
+  - "169.254.0.0/16"            # Link-local
+  - "10.0.0.0/8"
+  - "172.16.0.0/12"
+  - "192.168.0.0/16"
+  - "198.18.0.0/15"
+  - "198.19.0.0/16"
+
+# File store path (for IDS rule updates, optional)
+# file_store: no                # Disable for home-lab to reduce disk I/O
+
+# Output configuration
+outputs:
+  eve-json:
+    - filename: /var/log/suricata/eve.json              # Primary JSON log
+      enabled: yes
+      filetype: json
+      freq: 1                                            # Flush every 1 second
+      paste_metadata: yes                                # Include metadata in each event
+
+  file:
+    - filename: /var/log/suricata/alert.txt              # Human-readable text log (optional)
+      enabled: yes
+      filetype: regular
+      separator: " | "
+      delimiter: null
+
+# Rule paths for detection — include custom rules as needed
+rule-path:
+  - /rules                                              # Default Suricata ruleset
+  # - /rules/local                                       # Uncomment to load local custom rules
+
+# HTTP protocol parsing (important for web traffic analysis)
+http:
+  disabled: no
+  track-arguments: yes                                  # Log URL parameters
+  parse-paths: full                                      # Full path parsing
+
+# DNS settings
+dns:
+  querylog: yes                                         # Log DNS queries for forensic value
+  follow-cname: yes
+  max-answers: 64
+
+# Database output (disabled — using eve.json instead)
+# database:
+#   - filename: /var/log/suricata/active.sqlite3
+#     enabled: no
+
+# File metadata (for forensics)
+file-store: no                                          # See note in top of file
+
+# Network threat detection (optional enhancements)
+threat-intel-feeds:
+  # Uncomment and configure if using external feeds
+  # url: http://url/to/feeds/suricata.rules
+  # enabled: yes
+
+# Alert classification (severity mapping)
+classification:
+    default: unknown
+    flood: low
+    attempt: medium
+    success: high
+    suspicious: medium
+    policy-violation: medium
+    scan: low

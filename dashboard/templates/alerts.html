@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SOC Station — Alerts</title>
+    <style>
+        .alerts-container { display: flex; flex-direction: column; gap: 1rem; }
+        
+        .alert-card {
+            background: var(--bg-secondary);
+            border-left: 4px solid var(--accent);
+            padding: 1.5rem;
+            border-radius: 8px;
+            position: relative;
+        }
+        
+        .alert-critical { border-color: var(--critical); }
+        .alert-high { border-color: var(--high); }
+        .alert-medium { border-color: var(--medium); }
+        .alert-low { border-color: var(--low); }
+        
+        .alert-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; }
+        .alert-signature { font-weight: bold; color: var(--accent); font-size: 1.1rem; }
+        .alert-meta { font-family: monospace; font-size: 0.85rem; color: #89a3b6; }
+        
+        .alert-body { display: grid; grid-template-columns: 1fr 2fr; gap: 1rem; margin-top: 0.75rem; }
+        .alert-item { font-family: monospace; font-size: 0.9rem; color: #89a3b6; }
+        
+        .timestamp-badge { 
+            background: var(--bg-primary); 
+            padding: 0.25rem 0.75rem; 
+            border-radius: 4px; 
+            font-family: monospace; 
+            font-size: 0.85rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 style="color: var(--accent); margin-bottom: 1.5rem;">Live Alert Feed</h1>
+        
+        <div id="alerts-container" class="alerts-container">
+            {% for alert in alerts %}
+            <div class="alert-card alert-severity-{{ alert.severity }}">
+                <div class="alert-header">
+                    <span class="alert-signature">{{ alert.signature }}</span>
+                    <div style="display: flex; gap: 1rem;">
+                        <span class="badge-severity-{{ alert.severity }}">
+                            {% if alert.severity == 1 %}CRITICAL{% elif alert.severity == 2 %}HIGH{% elif alert.severity == 3 %}MEDIUM{% else %}LOW{% endif %}
+                        </span>
+                        <span class="timestamp-badge">
+                            {{ alert.timestamp }}
+                        </span>
+                    </div>
+                </div>
+                <div class="alert-body">
+                    <div class="alert-item">
+                        Source: <span style="color: var(--text-primary);">{{ alert.src_ip }}:{{ alert.src_port or '-' }}</span> → 
+                        Dest: <span style="color: var(--text-primary);">{{ alert.dest_ip }}:{{ alert.dest_port or '-' }}</span>
+                    </div>
+                    <div class="alert-item">
+                        Category: <span style="color: var(--text-primary);">{{ alert.category }}</span> | 
+                        Notified: <span style="color: {% if alert.notified %}var(--low){% else %}var(--critical){% endif %}">
+                            {% if alert.notified %}✓{% else %}✗{% endif %}
+                        </span>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- HTMX polling for real-time updates -->
+        <script>
+            // Poll for new alerts every 5 seconds
+            setInterval(async () => {
+                try {
+                    const response = await fetch('/api/alerts');
+                    const data = await response.json();
+                    
+                    if (data.alerts && data.alerts.length > 0) {
+                        // Insert new alerts at the top of the container
+                        const container = document.getElementById('alerts-container');
+                        const fragment = document.createDocumentFragment();
+                        
+                        data.alerts.forEach(alert => {
+                            const card = document.createElement('div');
+                            card.className = `alert-card alert-severity-${alert.severity}`;
+                            card.innerHTML = `
+                                <div class="alert-header">
+                                    <span class="alert-signature">${escapeHtml(alert.signature)}</span>
+                                    <div style="display: flex; gap: 1rem;">
+                                        <span class="badge-severity-${alert.severity}">
+                                            ${alert.severity === 1 ? 'CRITICAL' : alert.severity === 2 ? 'HIGH' : alert.severity === 3 ? 'MEDIUM' : 'LOW'}
+                                        </span>
+                                        <span class="timestamp-badge">${escapeHtml(alert.timestamp)}</span>
+                                    </div>
+                                </div>
+                                <div class="alert-body">
+                                    <div class="alert-item">
+                                        Source: <span style="color: var(--text-primary);">${escapeHtml(alert.src_ip)}:${escapeHtml(alert.src_port || '-')}</span> → 
+                                        Dest: <span style="color: var(--text-primary);">${escapeHtml(alert.dest_ip)}:${escapeHtml(alert.dest_port || '-')}</span>
+                                    </div>
+                                    <div class="alert-item">
+                                        Category: <span style="color: var(--text-primary);">${escapeHtml(alert.category)}</span> | 
+                                        Notified: <span style="color: ${alert.notified ? 'var(--low)' : 'var(--critical)'}">
+                                            ${alert.notified ? '✓' : '✗'}
+                                        </span>
+                                    </div>
+                                </div>
+                            `;
+                            fragment.appendChild(card);
+                        });
+                        
+                        container.insertBefore(fragment, container.firstChild);
+                    }
+                } catch (error) {
+                    console.error('Failed to fetch new alerts:', error);
+                }
+            }, 5000);
+
+            // Simple HTML escape helper
+            function escapeHtml(text) {
+                const div = document.createElement('div');
+                div.textContent = text;
+                return div.innerHTML;
+            }
+        </script>
+    </div>
+</body>
+</html>

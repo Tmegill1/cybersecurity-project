@@ -1,0 +1,56 @@
+# SOC Station - Docker Compose for IDS & Dashboard
+# Services: Suricata (IDS) + Flask Dashboard
+version: "3.8"
+
+services:
+  suricata:
+    image: docker.io/fortinet/suricata:latest
+    container_name: suricata_ids
+    restart: unless-stopped
+    volumes:
+      - ./docker/suricata:/config
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    environment:
+      - SURICATA_CONF=/config/suricata.yaml
+    ports:
+      - "3002:3002"              # Suricata HTTP API (optional)
+    networks:
+      - soc_network
+    # Run as root for now — see docs/setup.md for non-root hardening
+    # privileged: true            # May be needed for pcap interface access
+    cap_add:
+      - NET_ADMIN                # Required for network device access
+    healthcheck:
+      test: ["CMD", "suricata", "--version"]
+      interval: 30m
+      timeout: 10m
+      retries: 3
+
+  dashboard:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.dashboard
+    container_name: soc_dashboard
+    restart: unless-stopped
+    ports:
+      - "5000:5000"              # Flask app exposed on port 5000
+    environment:
+      - FLASK_ENV=development
+      - DATABASE_URL=sqlite:///db/soc_station.db
+    volumes:
+      - db_data:/app/db
+      - ./dashboard:/app/dashboard
+    networks:
+      - soc_network
+    depends_on:
+      - suricata
+
+volumes:
+  db_data:
+    driver: local
+    # Persistent SQLite database for aggregated events, CVEs, assets
+
+networks:
+  soc_network:
+    driver: bridge
+    # Internal network between Suricata and Flask app

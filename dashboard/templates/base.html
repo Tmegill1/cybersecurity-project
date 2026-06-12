@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SOC Station — {% block title %}Dashboard{% endblock %}</title>
+    <style>
+        :root {
+            --bg-primary: #1a1b26;
+            --bg-secondary: #24283b;
+            --text-primary: #c0caf5;
+            --text-secondary: #7aa2f7;
+            --accent: #7aa2f7;
+            --critical: #f7768e;
+            --high: #ff9e64;
+            --medium: #ffc180;
+            --low: #73daca;
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+        }
+        
+        .navbar {
+            background: var(--bg-secondary);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #3e4456;
+        }
+        
+        .navbar h1 { color: var(--accent); font-size: 1.5rem; }
+        
+        .nav-links a {
+            color: var(--text-primary);
+            text-decoration: none;
+            margin-left: 2rem;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            transition: background 0.2s;
+        }
+        
+        .nav-links a:hover,
+        .nav-links a.active {
+            background: var(--accent);
+            color: #fff;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        .status-bar {
+            display: flex;
+            gap: 2rem;
+            padding: 1rem;
+            background: var(--bg-secondary);
+            border-radius: 8px;
+            margin-bottom: 2rem;
+        }
+        
+        .status-item strong { color: var(--accent); }
+        
+        /* Severity badges */
+        .badge-critical { background: var(--critical); padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.75rem; }
+        .badge-high { background: var(--high); padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.75rem; }
+        .badge-medium { background: var(--medium); padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.75rem; }
+        .badge-low { background: var(--low); padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.75rem; }
+    </style>
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <nav class="navbar">
+        <h1>SOC Station</h1>
+        <div class="nav-links">
+            <a href="/" class="{% if request.url == '/' %}active{% endif %}">Dashboard</a>
+            <a href="/alerts" class="{% if '/alerts' in request.url %}active{% endif %}">Alerts</a>
+            <a href="/assets" class="{% if '/assets' in request.url %}active{% endif %}">Assets</a>
+            <a href="/cves" class="{% if '/cves' in request.url %}active{% endif %}">CVEs</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        {% block content %}{% endblock %}
+    </div>
+
+    <!-- HTMX script for polling -->
+    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+</body>
+</html>

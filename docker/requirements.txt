@@ -1,0 +1,6 @@
+# Flask Dashboard Requirements
+flask>=3.0.0
+werkzeug>=3.0.0
+requests>=2.31.0
+lxml>=4.9.0      # For Nmap XML parsing
+python-sqlite3   # Built-in, but listed for clarity

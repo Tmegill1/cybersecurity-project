@@ -1,0 +1,43 @@
+# Environment and secrets
+.env
+.env.local
+*.env
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+.venv/
+ENV/
+.build/
+dist/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Docker volumes (data)
+docker-compose.override.yml
+!docker-compose.override.yml.dist
+
+# Logs
+*.log
+suricata/evtx/
+suricata/eve.json
+
+# Database
+db/*.db
+db/*.sqlite
+db/*.sqlite3
+
+# Generated files
+*.egg-info/
+.pytest_cache/
+.mypy_cache/

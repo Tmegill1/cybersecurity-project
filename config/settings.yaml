@@ -1,0 +1,28 @@
+# SOC Station Configuration
+# Externalize all secrets to .env file — never commit actual values here
+---
+nmap:
+  scan_range: "192.168.1.0/24"      # CIDR range for LAN discovery
+  verbose_level: 2                   # -OvAeN for OS detection + version
+
+nvd_api:
+  base_url: "https://services.nvd.nist.gov/rest/json/cves/2.0"
+  rate_limit: 50                     # req per 30s (free tier without key)
+  cache_duration_hours: 24           # Re-fetch only if older than this
+
+abuseipdb_api:
+  base_url: "https://api.abuseipdb.com/api/v2/check"
+  max_age_days: 90                   # Cache results for 90 days
+  rate_limit: 100                    # req per day (free tier)
+
+webhooks:
+  discord:                           # Leave as empty string if not using Discord
+    enabled: false
+    url: ""                          # Set from .env file
+
+email:                              # SMTP settings for email alerts
+  enabled: false
+  server: ""                         # From .env file
+  port: 587
+  username: ""                       # From .env file
+  password: ""                       # From .env file

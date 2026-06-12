@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SOC Station — Discovered Assets</title>
+    <style>
+        .assets-container { background: var(--bg-secondary); border-radius: 8px; overflow: hidden; }
+        
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 0.75rem 1rem; text-align: left; border-bottom: 1px solid #3e4456; }
+        th { background: var(--bg-primary); color: var(--accent); font-weight: 600; }
+        
+        .port-badge { 
+            display: inline-block; 
+            background: var(--bg-primary); 
+            padding: 0.2rem 0.5rem; 
+            border-radius: 4px; 
+            font-family: monospace; 
+            font-size: 0.8rem;
+            margin: 0.1rem;
+        }
+        
+        .empty-state { text-align: center; padding: 3rem; color: #89a3b6; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 style="color: var(--accent); margin-bottom: 1.5rem;">Discovered Network Assets</h1>
+        
+        {% if assets %}
+        <div class="assets-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>IP Address</th>
+                        <th>Hostname</th>
+                        <th>MAC Address</th>
+                        <th>OS Guess</th>
+                        <th>Open Ports</th>
+                        <th>Last Seen</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for asset in assets %}
+                    <tr>
+                        <td style="font-weight: bold; color: var(--text-primary);">{{ asset.ip_address }}</td>
+                        <td>{{ asset.hostname }}</td>
+                        <td style="font-family: monospace; font-size: 0.85rem;">{{ asset.mac_address }}</td>
+                        <td><span class="os-badge">{{ asset.os_guess }}</span></td>
+                        <td>
+                            {% if asset.open_ports %}
+                                {% import json as json_lib %}
+                                {% set ports = json_lib.fromjson(asset.open_ports) %}
+                                {% for port in ports[:5] %}
+                                    {% set svc = port.get('service', {}) %}
+                                    <span class="port-badge">
+                                        {{ svc.get('name', 'unknown') }}:{{ port.get('number', '-') }}
+                                        {% if svc.get('product') %}| {{ svc.get('product')}}{% endif %}
+                                    </span>
+                                {% endfor %}
+                            {% else %}
+                                -
+                            {% endif %}
+                        </td>
+                        <td style="font-family: monospace; font-size: 0.85rem;">{{ asset.last_seen }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <h2>No assets discovered yet</h2>
+            <p>Run Nmap scanner to discover devices on your network.</p>
+        </div>
+        {% endif %}
+    </div>
+</body>
+</html>

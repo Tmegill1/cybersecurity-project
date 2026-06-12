@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SOC Station — CVE Lookup Results</title>
+    <style>
+        .cves-container { display: flex; flex-direction: column; gap: 1rem; }
+        
+        .cve-card {
+            background: var(--bg-secondary);
+            border-radius: 8px;
+            padding: 1.5rem;
+            border-left: 4px solid var(--accent);
+        }
+        
+        .cve-critical { border-color: var(--critical); }
+        .cve-high { border-color: var(--high); }
+        .cve-medium { border-color: var(--medium); }
+        .cve-low { border-color: var(--low); }
+        
+        .cve-header { display: flex; justify-content: space-between; align-items: start; margin-bottom: 0.5rem; }
+        .cve-id { font-family: monospace; color: var(--accent); font-size: 1.1rem; }
+        .cve-severity { 
+            background: {% if cve.severity == 'critical' %}var(--critical){% elif cve.severity == 'high' %}var(--high){% elif cve.severity == 'medium' %}var(--medium){% else %}var(--low){% endif %};
+            padding: 0.3rem 0.6rem; border-radius: 4px; font-size: 0.85rem; font-weight: bold;
+        }
+        
+        .cve-description { color: var(--text-secondary); line-height: 1.6; margin-bottom: 0.75rem; }
+        .cve-meta { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; font-family: monospace; font-size: 0.85rem; color: #89a3b6; }
+        
+        .empty-state { text-align: center; padding: 3rem; color: #89a3b6; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 style="color: var(--accent); margin-bottom: 1.5rem;">CVE Lookup Results</h1>
+        
+        {% if cves %}
+        <div id="cves-container" class="cves-container">
+            {% for cve in cves %}
+            <div class="cve-card cve-severity-{{ cve.severity }}">
+                <div class="cve-header">
+                    <span class="cve-id">{{ cve.cve_id }}</span>
+                    <span class="cve-severity">{{ cve.severity|upper }}</span>
+                </div>
+                <div class="cve-description">{{ cve.description }}</div>
+                <div class="cve-meta">
+                    <div><strong>CVSS Score:</strong> {{ cve.cvss_score or 'N/A' }}</div>
+                    <div><strong>Published:</strong> {{ cve.published_date or 'N/A' }}</div>
+                    <div><strong>Remediation:</strong> 
+                        <a href="{{ cve.remediation_url }}" target="_blank" rel="noopener">
+                            View advisory →
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <h2>No CVE data yet</h2>
+            <p>CVE results will appear here after Nmap scans and vulnerability lookups are complete.</p>
+        </div>
+        {% endif %}
+    </div>
+</body>
+</html>
